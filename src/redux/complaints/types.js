@@ -1,0 +1,5 @@
+const FETCH_COMPLAINTS_LIST = 'FETCH_COMPLAINTS_LIST';
+
+export default {
+    FETCH_COMPLAINTS_LIST
+}

@@ -1,0 +1,9 @@
+const UPDATE_FIELD = 'UPDATE_FIELD';
+const SET_IMAGES = 'SET_IMAGES';
+const FETCH_RESULT = 'FETCH_RESULT';
+
+export default {
+    UPDATE_FIELD,
+    SET_IMAGES,
+    FETCH_RESULT
+}
