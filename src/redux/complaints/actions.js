@@ -5,8 +5,14 @@ const fetchComplaintsList = list => ({
     list
 });
 
+const setNumOfPages = num => ({
+    type: types.SET_NUM_OF_PAGES,
+    num
+})
+
 const actions = {
-    fetchComplaintsList
+    fetchComplaintsList,
+    setNumOfPages
 }
 
 export default actions;

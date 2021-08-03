@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+#ReactSimpleImageViewer{
+    z-index: 10000000000;
+}

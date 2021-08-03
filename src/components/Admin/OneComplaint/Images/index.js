@@ -20,18 +20,19 @@ const Images = props => {
     const images = props.images ? props.images.map(img => packageJson.backendUrl + '/media/images/' + img.name) : [];
 
     return(
-        <div>
+        <div className="flex flex-wrap content-center">
             {images.map((image, key) =>
                 <img
                     src={image}
                     key={key}
                     alt={'image-' + key}
                     onClick={() => openImageViewer(key)}
+                    className="w-12/12 sm:w-5/12 md:w-3/12 xl:w-2/12"
                     style={{
                         height: 'auto',
-                        maxWidth: '300px',
                         margin: '5px',
-                        display: 'inline-block'
+                        display: 'block',
+                        position: 'static'
                     }}
                 />
             )}

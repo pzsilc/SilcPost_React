@@ -7,7 +7,7 @@ const initState = {
         title: "",
         _description: "",
         document_number: "",
-        reason_id: null,
+        reason: null,
         images: []
     }
 }
@@ -26,7 +26,7 @@ const addComplaintReducer = (state = initState, action) => {
             return {
                 ...state,
                 data: {
-                    ...state.date,
+                    ...state.data,
                     images: action.images
                 }
             }

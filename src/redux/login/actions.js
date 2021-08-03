@@ -6,8 +6,17 @@ const updateInput = (name, value) => ({
     value
 });
 
+const fetchAdmin = admin => ({
+    type: types.FETCH_ADMIN,
+    admin
+});
+
+const setError = () => ({ type: types.SET_ERROR })
+
 const actions = {
-    updateInput
+    updateInput,
+    fetchAdmin,
+    setError
 }
 
 export default actions;

@@ -9,7 +9,7 @@ const initState = {
 
 const orderReducer = (state = initState, action) => {
     switch(action.type){
-        case types.FETCH_REASONS:
+        case types.FETCH_ORDER:
             return {
                 ...state,
                 order: action.order

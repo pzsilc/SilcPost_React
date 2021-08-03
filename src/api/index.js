@@ -1,5 +1,6 @@
 import axios from 'axios';
 import packageJson from '../../package.json';
+import FormData from 'form-data'
 const API = packageJson.backendUrl + '/api';
 
 
@@ -68,9 +69,30 @@ class StatusesHandler{
 
 
 
+class MessageHandler{
+    static postMessage = data => new Promise((resolve, reject) => {
+        let formData = new FormData();
+        formData.append('content', data.content);
+        formData.append('owner_email', data.owner_email);
+        formData.append('complaint', data.complaint);
+        data.images.forEach((img, index) => formData.append('file_' + index, img));
+        axios.post(API + '/messages/', formData, {
+            headers: {
+                'Content-Type': `multipart/form-data`,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.data)
+        .then(res => resolve(res))
+        .catch(err => reject(err))
+    })
+}
+
+
+
 class ComplaintsHandler{
     static getComplaints = (filters, token) => new Promise((resolve, reject) => {
-        let vars = filters ? Object.keys(filters).map(key => key + '=' + filters[key]).join(', ') : "";
+        let vars = filters ? Object.keys(filters).map(key => key + '=' + filters[key]).join('&') : "";
         axios.get(API + `/complaints/?${vars}`, {
             headers: {
                 'Authorization': `Token ${token}`
@@ -89,9 +111,16 @@ class ComplaintsHandler{
     })
 
     static postComplaint = data => new Promise((resolve, reject) => {
-        axios.post(API + '/complaints/', data, {
+        let formData = new FormData();
+        formData.append('title', data.title);
+        formData.append('description', document.querySelector('textarea[name="_description"]').value);
+        formData.append('reason', data.reason);
+        formData.append('document_number', data.document_number);
+        formData.append('email', data.email);
+        data.images.forEach((img, index) => formData.append('file_' + index, img));
+        axios.post(API + '/complaints/', formData, {
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': `multipart/form-data`,
                 'Accept': 'application/json'
             }
         })
@@ -124,8 +153,8 @@ class ComplaintsHandler{
         .catch(err => reject(err.response))
     })
 
-    static checkIfExistsByDocumentNumber = documentNumber => new Promise((resolve, reject) => {
-        axios.post(API + `/documents/`, { documentNumber }, {
+    static checkIfExistsByDocumentNumber = document_number => new Promise((resolve, reject) => {
+        axios.post(API + `/documents/`, { document_number }, {
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -195,6 +224,7 @@ class AuthHandler{
 export {
     ReasonsHandler,
     StatusesHandler,
+    MessageHandler,
     ComplaintsHandler,
     AuthHandler
 }

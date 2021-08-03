@@ -1,30 +1,34 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-import { Header, Footer } from './components/Layout';
+import Header from './components/Layout/Header';
+import Footer from './components/Layout/Footer';
 import { IndexContainer } from './components/Index';
 import { ComplaintViewContainer } from './components/ComplaintView';
 import { AdminLoginContainer } from './components/Admin/Login';
+import { AdminLogoutContainer } from './components/Admin/Logout';
 import { AdminComplaintsListContainer } from './components/Admin/ComplaintsList';
 import { AdminOneComplaintContainer } from './components/Admin/OneComplaint';
 import { LoggedRoute, GuestRoute } from './middlewares';
+import { NotificationContainer } from 'react-notifications';
+import 'react-notifications/lib/notifications.css';
 
 const App = () => {
     return(
-        <div>
+        <BrowserRouter>
             <Header/>
-            <main className="mt-3 py-24">
-                <BrowserRouter>
-                    <Switch>
-                        <Route exact path='/' component={IndexContainer}/>
-                        <Route path='/complaint/:key' component={ComplaintViewContainer}/>
-                        <GuestRoute path='/admin/login' component={AdminLoginContainer}/>
-                        <LoggedRoute path='/admin/complaints/:key' component={AdminOneComplaintContainer}/>
-                        <LoggedRoute path='/admin' component={AdminComplaintsListContainer}/>
-                    </Switch>
-                </BrowserRouter>
+            <NotificationContainer/>
+            <main className="py-24">
+                <Switch>
+                    <Route exact path='/' component={IndexContainer}/>
+                    <GuestRoute path='/complaint/:key' component={ComplaintViewContainer}/>
+                    <GuestRoute path='/admin/login' component={AdminLoginContainer}/>
+                    <LoggedRoute path='/admin/logout' component={AdminLogoutContainer}/>
+                    <LoggedRoute path='/admin/complaints/:key' component={AdminOneComplaintContainer}/>
+                    <LoggedRoute path='/admin' component={AdminComplaintsListContainer}/>
+                </Switch>
             </main>
             <Footer/>
-        </div>
+        </BrowserRouter>
     )
 }
 

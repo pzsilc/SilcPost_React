@@ -1,11 +1,14 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux'
-import { ComplaintsHandler } from '../../../api';
+import { ComplaintsHandler, MessageHandler } from '../../../api';
 import complaintViewActions from '../../../redux/complaintView/actions';
 import loaderActions from '../../../redux/loader/actions';
 import orderActions from '../../../redux/order/actions';
 import Images from './Images';
 import Order from './Order';
+import Messages from './Messages';
+import { Notifications } from '../../../functions';
+import $ from 'jquery';
 
 
 const AdminOneComplaint = props => {
@@ -16,38 +19,64 @@ const AdminOneComplaint = props => {
 
     useEffect(() => {
         if(props._key){
-            ComplaintsHandler.getOneComplaint(props._key)
-            .then(res => {
-                props.fetchData(res);
-            })
-            .catch(err => {
-                console.log(err)
-            })
+            fetchComplaint();
         }
     }, [props._key])
 
     useEffect(() => {
-        if(props.data){
+        if(!$.isEmptyObject(props.data)){
             ComplaintsHandler.getOrderByComplaintKey(props.data.key)
             .then(res => {
-                props.fetchOrder(res);
+                props.fetchOrder(JSON.parse(res.data));
             })
             .catch(err => {
                 console.log(err)
+                Notifications.create('error', 'Nie udało się pobrać danych o zamówieniu powiązanym z reklamacją');
             })
         }
     }, [props.data]);
 
-    const execute = () => {
-        ComplaintsHandler.patchComplaint(props.data.id, {
-            status_id: props.data.status_id + 1
-        }, props.token)
+    const fetchComplaint = () => {  
+        ComplaintsHandler.getOneComplaint(props._key)
         .then(res => {
-            console.log(res)
-            props.history.push('/admin/complaints/' + props._key)
+            props.fetchData(res);
         })
         .catch(err => {
             console.log(err)
+            Notifications.create('error', 'Nie udało się pobrać danych o reklamacji');
+        })
+    }
+
+    const sendMessage = (e, images) => {
+        e.preventDefault();
+        let data = {
+            content: e.target.content.value,
+            owner_email: props.clientMode ? props.data.email : props.admin.email,
+            complaint: props.data.id,
+            images
+        }
+        MessageHandler.postMessage(data)
+        .then(res => {
+            Notifications.create('success', 'Wysłano wiadomość');
+            fetchComplaint();
+            document.querySelector('textarea[name="content"]').value = '';
+        })
+        .catch(err => {
+            console.log(err);
+            Notifications.create('error', 'Coś poszło nie tak');
+        })
+    }
+
+    const execute = () => {
+        ComplaintsHandler.patchComplaint(props.data.id, {
+            status: props.data.status.id + 1
+        }, props.token)
+        .then(res => {
+            fetchComplaint();
+            Notifications.create('success', 'Zaktualizowano reklamację');
+        })
+        .catch(err => {
+            Notifications.create('error', 'Nie udało się zaktualizować reklamacji');
         })
     }
 
@@ -68,57 +97,79 @@ const AdminOneComplaint = props => {
     }
 
     return(
-        <div className="mt-32 p-5">
-            <h1 className="text-5xl mb-10">Reklamacja #{props.data.id}</h1>
-            <hr/>
-            <div className="flex mt-10">
+        <div style={{ overflow: 'hidden' }}>
+            <div className="bg-green-400 text-white p-10 pt-32" style={{ marginTop: '-23px' }}>
+                <b className="text-2xl">Reklamacja #{props.data.id}</b>
+            </div>
+            <div className="mt-10 md:border p-5 w-full md:w-8/12 mx-auto">
                 <div className="w-4/12">
-                    <table className="table-auto">
+                    <table className="table-auto text-left">
                         <tbody>
                             <tr>
-                                <th>ID</th>
-                                <td>{props.data.id}</td>
+                                <th className="text-green-500">ID</th>
+                                <td className="pl-2">{props.data.id}</td>
                             </tr>
                             <tr>
-                                <th>Nr dokumentu</th>
-                                <td>{props.data.document_number}</td>
+                                <th className="text-green-500">NR DOK.</th>
+                                <td className="pl-2">{props.data.document_number}</td>
                             </tr>
                             <tr>
-                                <th>Powód reklamacji</th>
-                                <td>{props.data.reason ? props.data.reason.name : ""}</td>
+                                <th className="text-green-500">POWÓD</th>
+                                <td className="pl-2">{props.data.reason ? props.data.reason.name : ""}</td>
                             </tr>
                             <tr>
-                                <th>Status</th>
-                                <td>{props.data.status ? props.data.status.name : ""}</td>
+                                <th className="text-green-500">STATUS</th>
+                                <td className="pl-2">{props.data.status ? props.data.status.name : ""}</td>
                             </tr>
                             <tr>
-                                <th>Email kontaktowy</th>
-                                <td>{props.data.email}</td>
+                                <th className="text-green-500">DATA DODANIA</th>
+                                <td className="pl-2">{props.data.created_at}</td>
                             </tr>
+                            {!props.clientMode &&
+                                <tr>
+                                    <th className="text-green-500">EMAIL</th>
+                                    <td className="pl-2">{props.data.email}</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
-                    {(props.data.status && !props.data.status.id !== 3) && 
-                        <div>
-                            <button 
-                                className=""
-                                onClick={execute}
-                            >
-                                {getExecuteTextByStatusId(props.data.status.id)}
-                            </button>
-                        </div>
+                    {!props.clientMode &&
+                        <React.Fragment>
+                            {(props.data.status && props.data.status.id != 3) && 
+                                <div className="mt-10 w-screen">
+                                    <button 
+                                        className="bg-green-300 rounded-3xl p-2 px-10"
+                                        onClick={execute}
+                                    >
+                                        <i className="fa fa-cog mr-3"></i>
+                                        {getExecuteTextByStatusId(props.data.status.id)}
+                                    </button>
+                                </div>
+                            }
+                        </React.Fragment>
                     }
                 </div>
-                <div className="w-8/12 border-l-2 border-gray-200 pl-20">
+                <br/>
+                <div className="mt-10">
                     <h3 className="text-2xl"><b>Tytuł:</b> {props.data.title}</h3>
                     <br/>
                     <b>Opis</b>
                     <div className="text-sm" dangerouslySetInnerHTML={{ __html: props.data.description }}/>
+                    <br/><br/>
                     <Images images={props.data.images}/>
+                    <br/>
+                    <Order order={props.order} />
+                    <br/>
+                    {!$.isEmptyObject(props.data) &&
+                        <Messages 
+                            messages={props.data.messages} 
+                            sendMessage={sendMessage}
+                            email={props.data.email}
+                        />
+                    }
                 </div>
-            </div>
-            <br/>
-            <small className="text-gray-400">Klucz: {props.data.key}</small>
-            <Order />
+                <small className="text-gray-400">Klucz: {props.data.key}</small> 
+            </div>          
         </div>
     )
 }
@@ -130,7 +181,8 @@ const mapStateToProps = state => ({
     data: state.complaintView.data,
     loading: state.loader.loading,
     token: state.token.token,
-    order: state.order.order
+    order: state.order.order,
+    admin: state.login.admin
 })
 
 const mapDispatchToProps = dispatch => ({

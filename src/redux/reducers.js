@@ -8,6 +8,7 @@ import loaderReducer from './loader/reducer';
 import loginReducer from './login/reducer';
 import tokenReducer from './token/reducer';
 import orderReducer from './order/reducer';
+import filtersReducer from './filters/reducer';
 
 export default combineReducers({
     addComplaint: addComplaintReducer,
@@ -18,5 +19,6 @@ export default combineReducers({
     loader: loaderReducer,
     login: loginReducer,
     token: tokenReducer,
-    order: orderReducer
+    order: orderReducer,
+    filters: filtersReducer,
 });

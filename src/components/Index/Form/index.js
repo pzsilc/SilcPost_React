@@ -1,24 +1,17 @@
-import React, { useState } from 'react';
-import MultiImageInput from 'react-multiple-image-input';
+import React from 'react';
+import ImagesInput from '../../Admin/OneComplaint/ImagesInput';
 import './style.css';
 
 const Form = props => {
-
-    const crop = {
-        unit: '%',
-        aspect: 4 / 3,
-        width: '100'
-    }
-
     return(
-        <div className="py-16">
+        <div>
             <form 
                 onSubmit={props.onSubmit}
-                className="mx-auto w-11/12 lg:w-8/12 p-5 my-16"
+                className="mx-auto w-11/12 lg:w-8/12 p-5 mb-16"
                 id='form'
             >
                 <h1 className="text-3xl text-center mb-10 text-gray-400 font-bold">Złóż reklamację</h1>
-                <div className='grid grid-cols-3 gap-4'>
+                <div className='md:grid grid-cols-3 gap-4'>
                     <label className='col-span-2'>
                         <p className="font-bold text-gray-400">Tytuł</p>
                         <input 
@@ -29,6 +22,7 @@ const Form = props => {
                             required
                         />
                     </label>
+                    <br className="md:hidden"/>
                     <label>
                         <p className="font-bold text-gray-400">Numer faktury / paragonu</p>
                         <input 
@@ -41,7 +35,7 @@ const Form = props => {
                     </label>
                 </div>
                 <label>
-                    <p className="font-bold text-gray-400">Opis</p>
+                    <p className="font-bold text-gray-400 mt-10">Opis</p>
                     <textarea
                         name="_description" 
                         className="appearance-none border border-gray-200 mt-2 rounded-xl w-full py-2 px-3 text-gray-700 mb-3 bg-gray-100"
@@ -49,7 +43,7 @@ const Form = props => {
                         required
                     ></textarea>
                 </label>
-                <div className='grid grid-cols-3 gap-4'>
+                <div className='md:grid grid-cols-3 gap-4 mt-10'>
                     <label>
                         <p className="font-bold text-gray-400">Email</p>
                         <input 
@@ -67,11 +61,11 @@ const Form = props => {
                                 <li key={key}>
                                     <input 
                                         type='radio' 
-                                        name='reason_id' 
+                                        name='reason' 
                                         value={reason.id}
                                         id={`reason_${reason.id}`}
                                         onChange={props.onChange} 
-                                        checked={props.props.formData.reason_id == reason.id}
+                                        checked={props.props.formData.reason == reason.id}
                                         required
                                     />
                                     <label htmlFor={`reason_${reason.id}`}>{reason.name}</label>
@@ -80,19 +74,18 @@ const Form = props => {
                         </ul>
                     </div>
                 </div>
+                <br className="md:hidden"/>
                 <label>
-                    Zdjęcia
-                    <MultiImageInput
+                    <p className="font-bold text-gray-400 mt-10">Zdjęcia</p>
+                    <ImagesInput
                         max={10}
-                        theme="light"
                         images={props.props.formData.images}
                         setImages={props.setImages}
-                        cropConfig={{ crop, ruleOfThirds: true }}
                     />
                 </label>
                 <button
                     type="submit"
-                    className="text-center text-white bg-green-600 p-3 mt-5 rounded"
+                    className="text-center text-white bg-green-600 p-3 mt-10 rounded"
                 >
                     Wyślij
                 </button>
