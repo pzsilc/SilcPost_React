@@ -1,30 +1,25 @@
 import React from 'react';
-import { BrowserRouter, Switch, Route } from "react-router-dom";
-import Header from './components/Layout/Header';
-import Footer from './components/Layout/Footer';
-import { IndexContainer } from './components/Index';
-import { ComplaintViewContainer } from './components/ComplaintView';
-import { AdminLoginContainer } from './components/Admin/Login';
-import { AdminLogoutContainer } from './components/Admin/Logout';
-import { AdminComplaintsListContainer } from './components/Admin/ComplaintsList';
-import { AdminOneComplaintContainer } from './components/Admin/OneComplaint';
+import { BrowserRouter, Switch } from "react-router-dom";
 import { LoggedRoute, GuestRoute } from './middlewares';
 import { NotificationContainer } from 'react-notifications';
 import 'react-notifications/lib/notifications.css';
+import { Header, Footer } from './components/Layout';
+import Home from './components/Home';
+import { LoginContainer, LogoutContainer } from './components/Auth';
+import { DashboardListContainer, DashboardSingleContainer } from './components/Dashboard';
 
 const App = () => {
     return(
         <BrowserRouter>
             <Header/>
             <NotificationContainer/>
-            <main className="py-24">
+            <main className="pt-24">
                 <Switch>
-                    <Route exact path='/' component={IndexContainer}/>
-                    <GuestRoute path='/complaint/:key' component={ComplaintViewContainer}/>
-                    <GuestRoute path='/admin/login' component={AdminLoginContainer}/>
-                    <LoggedRoute path='/admin/logout' component={AdminLogoutContainer}/>
-                    <LoggedRoute path='/admin/complaints/:key' component={AdminOneComplaintContainer}/>
-                    <LoggedRoute path='/admin' component={AdminComplaintsListContainer}/>
+                    <GuestRoute exact path="/" component={Home} />
+                    <GuestRoute path="/login" component={LoginContainer} />
+                    <LoggedRoute path="/logout" component={LogoutContainer} />
+                    <LoggedRoute exact path="/dashboard" component={DashboardListContainer} />
+                    <LoggedRoute path="/dashboard/drugstores/:pk" component={DashboardSingleContainer} />
                 </Switch>
             </main>
             <Footer/>

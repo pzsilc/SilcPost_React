@@ -7,6 +7,11 @@ header nav{
     top: 0;
     left: 0;
     z-index: 99999;
+    background: #1b1b1b;
+}
+
+header nav a{
+    color: #4b4b4b !important;
 }
 
 .underline{
