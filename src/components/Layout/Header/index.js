@@ -21,13 +21,13 @@ class Header extends React.Component {
         return(
             <header>
                 <nav className="flex justify-between w-full p-3 pb-0 md:pb-2">
-                    <Link 
-                        to="/" 
+                    <Link
+                        to="/grafiki/"
                         className="inline-block"
                     >
                         <div className="flex items-center flex-no-shrink text-white mr-6 lg:ml-24">
                             <img
-                                src="/logo.png"
+                                src="/grafiki/logo.png"
                                 alt="Logo"
                                 style={{
                                     width: '180px'
@@ -38,8 +38,8 @@ class Header extends React.Component {
                     <div className="flex justify-content-between text-gray-800">
                         {!this.props.user &&
                             <React.Fragment>
-                                <Link 
-                                    to="/login" 
+                                <Link
+                                    to="/grafiki/login"
                                     className="pb-2 md:pb-0 mt-3 md:mt-2 mr-4 text-gray-400 text-xs md:text-lg pt-1"
                                 >
                                     <b>ZALOGUJ SIĘ</b>
@@ -56,16 +56,16 @@ class Header extends React.Component {
                                     <ul className="dropdown-menu absolute hidden text-gray-700 pt-1 w-full">
                                         {this.props.user.is_superuser &&
                                             <li className="/">
-                                                <Link 
-                                                    className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap" 
-                                                    to="/dashboard"
+                                                <Link
+                                                    className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
+                                                    to="/grafiki/dashboard"
                                                 >Panel admnistratora</Link>
                                             </li>
                                         }
                                         <li className="">
-                                            <Link 
-                                                className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap" 
-                                                to="/logout"
+                                            <Link
+                                                className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
+                                                to="/grafiki/logout"
                                             >Wyloguj się</Link>
                                         </li>
                                     </ul>
@@ -90,7 +90,7 @@ const mapDispatchToProps = dispatch => ({
 })
 
 const HeaderContainer = connect(
-    mapStateToProps, 
+    mapStateToProps,
     mapDispatchToProps
 )(Header)
 

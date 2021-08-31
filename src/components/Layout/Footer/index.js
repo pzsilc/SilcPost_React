@@ -7,8 +7,8 @@ const Footer = () => {
         <footer className="text-center py-3 text-gray-400" style={{ background: '#1b1b1b' }}>
             <div className="md:flex justify-around w-1/2 mx-auto mb-4">
                 <div>
-                    <img 
-                        src="/logo.png" 
+                    <img
+                        src="/grafiki/logo.png" 
                         alt="Pink Logo"
                         width="100"
                         className="mx-auto mt-5"
@@ -26,25 +26,25 @@ const Footer = () => {
                     </a>
                 </div>
                 <div className="text-3xl mt-3">
-                    <a 
-                        target="_blank" 
-                        href="" 
+                    <a
+                        target="_blank"
+                        href=""
                         className="fab fa-facebook m-2 hover:text-green-400"
                     ></a>
-                    <a 
-                        target="_blank" 
-                        href="" 
+                    <a
+                        target="_blank"
+                        href=""
                         className="fab fa-instagram m-2 hover:text-green-400"
                     ></a>
                     <br/>
-                    <a 
-                        target="_blank" 
-                        href="" 
+                    <a
+                        target="_blank"
+                        href=""
                         className="fab fa-linkedin-in m-2 hover:text-green-400"
                     ></a>
-                    <a 
-                        target="_blank" 
-                        href="" 
+                    <a
+                        target="_blank"
+                        href=""
                         className="fab fa-twitter m-2 hover:text-green-400"
                     ></a>
                 </div>

@@ -25,12 +25,10 @@ const Login = props => {
         e.preventDefault();
         login(data.email, data.password)
         .then(res => {
-            console.log(res);
-            props.setToken(res.key);
-            window.location.replace('/dashboard');
+            props.setToken(res.token);
+            window.location.replace('/grafiki/dashboard');
         })
         .catch(err => {
-            console.log(err);
             createNotification('error', 'Email lub hasło są błędne');
             emailInput.current.classList.add('border-red-500');
             psswdInput.current.classList.add('border-red-500');
@@ -38,7 +36,7 @@ const Login = props => {
     }
 
     return(
-        <form 
+        <form
             onSubmit={onSubmit}
             className="p-10 mx-auto border shadow-xl w-11/12 md:2/3 lg:w-1/2 mx-auto mt-36 mb-64 flex"
         >
@@ -87,7 +85,7 @@ const Login = props => {
             </div>
             <div className="hidden md:block w-5/12 align-center">
                 <img
-                    src="/login-bg.jpg"
+                    src="/grafiki/login-bg.jpg"
                     style={{ width: '350px' }}
                     alt="Login bg"
                 />

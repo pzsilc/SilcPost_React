@@ -10,7 +10,7 @@ const Logout = props => {
         .then(res => {
             console.log(res);
             props.removeToken();
-            window.location.replace('/login');
+            window.location.replace('/grafiki/login');
         })
         .catch(err => {
             console.log(err);
@@ -25,6 +25,6 @@ const mapDispatchToProps = dispatch => ({
 })
 
 export const LogoutContainer = connect(
-    null, 
+    null,
     mapDispatchToProps
 )(Logout)

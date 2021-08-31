@@ -18,13 +18,6 @@ const DashboardList = props => {
         .then(res => setDrugstores(res))
         .catch(err => {
             console.log(err);
-            if(props.token){
-                if(props.user.drugstore){
-                    props.history.push(`/dashboard/drugstores/${props.user.drugstore}`);
-                } else {
-                    props.history.push('/logout');
-                }
-            }
             createNotification('error', 'Nie udało się pobrać danych');
         });
     }
@@ -34,7 +27,6 @@ const DashboardList = props => {
         const { value } = e.target.name;
         createDrugstore(props.token, { name: value })
         .then(res => {
-            console.log(res);
             createNotification('success', 'Utworzono drogerię');
             fetchDrugstores();
         })
@@ -75,10 +67,10 @@ const DashboardList = props => {
                         </b>
                         <br/>
                         <br/>
-                        <input 
-                            type="text" 
-                            name="name" 
-                            className="border p-2 mr-1" 
+                        <input
+                            type="text"
+                            name="name"
+                            className="border p-2 mr-1"
                             maxLength="64"
                             placeholder="Nazwa"
                             required
@@ -104,16 +96,16 @@ const DashboardList = props => {
                             </thead>
                             <tbody>
                                 {drugstores.map((ds, key) =>
-                                    <tr 
+                                    <tr
                                         key={key}
                                         className={key % 2 === 0 ? 'bg-green-400' : 'bg-green-300'}
                                     >
-                                        <td className="p-2"><b>{ds.pk}</b></td>
+                                        <td className="p-2"><b>{ds.id}</b></td>
                                         <td className="p-2">{ds.name}</td>
                                         <td className="p-2">
-                                            <Link 
+                                            <Link
                                                 className="text-green-100"
-                                                to={`/dashboard/drugstores/${ds.pk}`}
+                                                to={`/dashboard/drugstores/${ds.id}`}
                                             >
                                                 <i className="fa fa-sign-out-alt mr-2"></i>
                                                 Zobacz grafiki
@@ -136,6 +128,6 @@ const mapStateToProps = state => ({
 })
 
 export const DashboardListContainer = connect(
-    mapStateToProps, 
+    mapStateToProps,
     null
 )(DashboardList);

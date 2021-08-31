@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { createSchedule, deleteSchedule, getDrugstoreDetails } from '../../../api';
 import { createNotification } from '../../../functions';
 import { Link } from "react-router-dom";
+import packageJson from '../../../../package.json';
 
 
 const DashboardSingle = props => {
@@ -16,11 +17,10 @@ const DashboardSingle = props => {
     }, []);
 
     const fetchData = () => {
-        const pk = props.match.params.pk;
-        getDrugstoreDetails(props.token, pk)
+        const id = props.match.params.id;
+        getDrugstoreDetails(props.token, id)
         .then(res => {
-            console.log(res);
-            setData(res)
+            setData(res.data)
         })
         .catch(err => {
             console.log(err);
@@ -28,23 +28,16 @@ const DashboardSingle = props => {
         })
     }
 
-    const onClick = schedule => {
-        const base64 = `data:application/xlsx;base64,${schedule}`;
-        const a = document.createElement('a');
-        const name = "grafik.xlsx";
-        a.href = base64;
-        a.download = name;
-        a.click();
-    }
-
     const createNewSchedule = e => {
         e.preventDefault();
         const { name, file } = e.target;
-        createSchedule(props.token, name.value, file.files[0], data.pk)
+        createSchedule(props.token, name.value, file.files[0], data.id)
         .then(res => {
             console.log(res);
             createNotification('success', 'Dodano pomyślnie');
             fetchData();
+            setFile(null);
+            document.querySelector('input[name="name"]').value = "";
         })
         .catch(err => {
             if(err.response){
@@ -60,8 +53,8 @@ const DashboardSingle = props => {
         })
     }
 
-    const delSchedule = pk => {
-        deleteSchedule(props.token, pk)
+    const delSchedule = id => {
+        deleteSchedule(props.token, id)
         .then(res => {
             createNotification('success', 'Usunięto pomyślnie');
             fetchData();
@@ -72,6 +65,14 @@ const DashboardSingle = props => {
         })
     }
 
+    const onClick = schedule => {
+        const base64 = `data:application/xlsx;base64,${schedule}`;
+        const a = document.createElement('a');
+        const name = "grafik.xlsx";
+        a.href = base64;
+        a.download = name;
+        a.click();
+    }
 
     if(error){
         return(
@@ -80,7 +81,7 @@ const DashboardSingle = props => {
                     404 | Coś poszło nie tak :(
                 </div>
                 <img
-                    src="/cj.png"
+                    src="/grafiki/cj.png"
                     style={{
                         position: 'absolute',
                         right: '0',
@@ -101,23 +102,23 @@ const DashboardSingle = props => {
                 <p className="text-center mb-36 pb-16">Pobieram dane...</p>
             </React.Fragment>
         )
-    } 
+    }
     else{
         return(
             <React.Fragment>
-                {props.user.is_superuser &&
-                    <Link 
-                        to="/dashboard/"
+                {Boolean(props.user.is_superuser) &&
+                    <Link
+                        to="/grafiki/dashboard/"
                         className="text-7xl ml-5"
                     >&#x2039;</Link>
                 }
                 <div className="border shadow-xl w-11/12 lg:w-1/2 mx-auto p-3 md:p-10 mt-36 mb-96">
                     <div className="text-center">
                         <h1 className="text-xl md:text-3xl">{data.name}</h1>
-                        <small className="text-gray-400 float-right -mt-10">ID: {data.pk}</small>
+                        <small className="text-gray-400 float-right -mt-10">ID: {data.id}</small>
                     </div>
                     <div>
-                        {props.user.is_superuser &&
+                        {Boolean(props.user.is_superuser) &&
                             <React.Fragment>
                                 <form
                                     onSubmit={createNewSchedule}
@@ -167,12 +168,12 @@ const DashboardSingle = props => {
                         }
                         <h3 className="text-xl my-10 mt-5">Grafiki</h3>
                         {data.schedules.map((sd, key) =>
-                            <div 
+                            <div
                                 key={key}
                                 className="m-3 w-full flex justify-between"
                             >
                                 <div className="flex">
-                                    <button 
+                                    <button
                                         className="fa fa-download text-3xl"
                                         onClick={() => onClick(sd.file)}
                                     >
@@ -182,12 +183,12 @@ const DashboardSingle = props => {
                                 </div>
                                 <span className="text-gray-400 mr-3">
                                     {sd.created_at}
-                                    {props.user.is_superuser && 
+                                    {Boolean(props.user.is_superuser) &&
                                         <React.Fragment>
                                             <br/>
                                             <button
                                                 type="button"
-                                                onClick={() => delSchedule(sd.pk)}
+                                                onClick={() => delSchedule(sd.id)}
                                                 className="bg-red-500 p-1 px-2 float-right text-white rounded"
                                             >
                                                 <i className="fa fa-trash"></i>
@@ -215,6 +216,6 @@ const mapStateToProps = state => ({
 })
 
 export const DashboardSingleContainer = connect(
-    mapStateToProps, 
+    mapStateToProps,
     null
 )(DashboardSingle);

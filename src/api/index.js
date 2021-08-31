@@ -1,22 +1,28 @@
 import axios from 'axios';
+import { toFormData } from '../functions';
 import packageJson from '../../package.json';
-import FormData from 'form-data'
 const API = packageJson.backendUrl + '/api';
 
 
 
 const login = (email, password) => new Promise((resolve, reject) => {
-    axios.post(API + '/auth/login/', {
+    axios.post(API + '/auth/login/', toFormData({
         email,
         password
-    }, {
+    }), {
         headers: {
             'Content-Type': 'application/json',
-            'Accept': 'application/json'        
+            'Accept': 'application/json'
         }
     })
-    .then(res => resolve(res.data))
-    .catch(err => reject(err))
+    .then(res => {
+        console.log(res)
+        resolve(res.data)
+    })
+    .catch(err => {
+        console.log(err.response)
+        reject(err)
+    })
 })
 
 
@@ -41,7 +47,9 @@ const getUserInfo = token => new Promise((resolve, reject) => {
             'Authorization': `Token ${token}`
         }
     })
-    .then(res => resolve(res))
+    .then(res => {
+        resolve(res)
+    })
     .catch(err => reject(err))
 })
 
@@ -53,15 +61,15 @@ const getDrugstories = token => new Promise((resolve, reject) => {
             'Authorization': `Token ${token}`
         }
     })
-    .then(res => res.data)
+    .then(res => res.data.data)
     .then(res => resolve(res))
     .catch(err => reject(err))
 })
 
 
 
-const getDrugstoreDetails = (token, pk) => new Promise((resolve, reject) => {
-    axios.get(API + '/drugstores/' + pk + '/', {
+const getDrugstoreDetails = (token, id) => new Promise((resolve, reject) => {
+    axios.get(API + '/drugstores/' + id + '/', {
         headers: {
             'Authorization': `Token ${token}`
         }
@@ -74,7 +82,7 @@ const getDrugstoreDetails = (token, pk) => new Promise((resolve, reject) => {
 
 
 const createDrugstore = (token, data) => new Promise((resolve, reject) => {
-    axios.post(API + '/drugstores/', data, {
+    axios.post(API + '/drugstores/', toFormData(data), {
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Token ${token}`
@@ -87,32 +95,40 @@ const createDrugstore = (token, data) => new Promise((resolve, reject) => {
 
 
 
-const createSchedule = (token, name, file, drugstorePk) => new Promise((resolve, reject) => {
-    let data = new FormData();
-    data.append('name', name);
-    data.append('file', file);
-    data.append('drugstore', drugstorePk);
-    axios.post(API + '/schedules/', data, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-            'Accept': 'application/json',
-            'Authorization': `Token ${token}`
-        }
-    })
-    .then(res => res.data)
-    .then(res => resolve(res))
-    .catch(err => reject(err))
+const createSchedule = (token, name, file, drugstore) => new Promise((resolve, reject) => {
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+        axios.post(API + '/schedules/', toFormData({
+            name,
+            file_input: reader.result,
+            drugstore
+        }), {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Accept': 'application/json',
+                'Authorization': `Token ${token}`
+            }
+        })
+        .then(res => res.data)
+        .then(res => resolve(res))
+        .catch(err => {
+            console.log(err.response);
+            reject(err);
+        })
+    }
+    reader.onerror = err => reject(err);
 })
 
 
 
-const deleteSchedule = (token, pk) => new Promise((resolve, reject) => {
-    axios.delete(API + '/schedules/' + pk + '/', {
+const deleteSchedule = (token, id) => new Promise((resolve, reject) => {
+    axios.delete(API + '/schedules/' + id + '/', {
         headers: {
             'Authorization': `Token ${token}`
         }
     })
-    .then(res => res.data)
+    .then(res => {console.log(res); return res.data})
     .then(res => resolve(res))
     .catch(err => reject(err))
 })
