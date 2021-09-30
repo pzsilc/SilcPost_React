@@ -26,7 +26,22 @@ const toFormData = data => {
     return formData;
 }
 
+const getNow = () => new Date().toJSON().slice(0, 19).replace('T', ' ');
+
+const download = (base64, type = 'pdf') => {
+  if(base64){
+      const linkSource = `data:application/${type};base64,${base64}`;
+      const downloadLink = document.createElement("a");
+      const fileName = "file." + type;
+      downloadLink.href = linkSource;
+      downloadLink.download = fileName;
+      downloadLink.click();
+  }
+}
+
 export {
     createNotification,
-    toFormData
+    toFormData,
+    getNow,
+    download
 }

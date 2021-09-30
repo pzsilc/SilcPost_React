@@ -1,6 +1,6 @@
 import types from './types';
-
-const tokenName = 'vy5kyuh3i55gk6b74il3ig8hughlnoid088078vf8od';
+import packageJson from '../../../package.json';
+const tokenName = packageJson.authKey;
 
 const initState = {
     token: window.localStorage.getItem(tokenName),

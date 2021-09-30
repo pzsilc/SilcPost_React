@@ -9,11 +9,11 @@ import { Link } from "react-router-dom";
 const Login = props => {
 
     const emailInput = React.createRef();
-    const psswdInput = React.createRef();
+    const tokenInput = React.createRef();
 
     const [data, setData] = useState({
         email: "",
-        password: ""
+        token: ""
     })
 
     const onChange = e => {
@@ -23,32 +23,32 @@ const Login = props => {
 
     const onSubmit = e => {
         e.preventDefault();
-        login(data.email, data.password)
+        login(data.email, data.token)
         .then(res => {
-            props.setToken(res.token);
-            window.location.replace('/grafiki/dashboard');
+            props.setToken(res.data);
+            props.history.push('/silcpost/confirm')
         })
         .catch(err => {
-            createNotification('error', 'Email lub hasło są błędne');
+            createNotification('error', 'Email lub token są błędne');
             emailInput.current.classList.add('border-red-500');
-            psswdInput.current.classList.add('border-red-500');
+            tokenInput.current.classList.add('border-red-500');
         })
     }
 
     return(
         <form
             onSubmit={onSubmit}
-            className="p-10 mx-auto border shadow-xl w-11/12 md:2/3 lg:w-1/2 mx-auto mt-36 mb-64 flex"
+            className="p-10 mx-auto bg-gray-500 shadow-3xl rounded-3xl shadow-xl w-11/12 md:2/3 lg:w-1/2 mx-auto mt-20 mb-64 flex"
         >
-            <div className="w-full md:w-1/2 mr-10">
+            <div className="w-full text-center text-2xl">
                 <Link
-                    to="/"
-                    className="text-5xl"
+                    to="/silcpost/"
+                    className="text-5xl hover:no-underline hover:text-gray-300 float-left"
                 >
                     &#x2039;
                 </Link>
-                <b className="text-center md:text-left text-2xl block my-10">Logowanie</b>
-                <label>
+                <b className="text-center mb-10 block text-5xl text-gray-400">Logowanie</b>
+                <label className="text-left w-1/2">
                     <i className="fa fa-user mr-2"></i>
                     <b>Email</b>
                     <br/>
@@ -56,38 +56,31 @@ const Login = props => {
                         ref={emailInput}
                         type="email"
                         name="email"
-                        className="border w-full p-1 px-3 rounded-3xl shadow mt-2"
+                        className="w-full p-2 mt-3 shadow rounded-xl bg-gray-400"
                         onChange={onChange}
                         value={data.email}
                     />
                 </label>
                 <br/>
                 <br/>
-                <label>
+                <label className="text-left w-1/2">
                     <i className="fa fa-lock mr-2"></i>
-                    <b>Hasło</b>
+                    <b>Token</b>
                     <br/>
                     <input
-                        ref={psswdInput}
+                        ref={tokenInput}
                         type="password"
-                        name="password"
-                        className="border w-full p-1 px-3 rounded-3xl shadow mt-2"
+                        name="token"
+                        className="w-full p-2 mt-3 shadow rounded-xl bg-gray-400"
                         onChange={onChange}
-                        value={data.password}
+                        value={data.token}
                     />
                 </label>
                 <br/>
                 <input
                     type="submit"
-                    className="w-full bg-black rounded-3xl text-gray-400 py-1 mt-14 cursor-pointer"
+                    className="w-1/2 bg-purple-500 py-3 rounded-3xl shadow text-3xl text-purple-300 mt-14 cursor-pointer"
                     value="Zaloguj się"
-                />
-            </div>
-            <div className="hidden md:block w-5/12 align-center">
-                <img
-                    src="/grafiki/login-bg.jpg"
-                    style={{ width: '350px' }}
-                    alt="Login bg"
                 />
             </div>
         </form>

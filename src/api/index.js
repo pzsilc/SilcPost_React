@@ -1,14 +1,14 @@
 import axios from 'axios';
-import { toFormData } from '../functions';
+import { toFormData, getNow } from '../functions';
 import packageJson from '../../package.json';
 const API = packageJson.backendUrl + '/api';
 
 
 
-const login = (email, password) => new Promise((resolve, reject) => {
+const login = (email, token) => new Promise((resolve, reject) => {
     axios.post(API + '/auth/login/', toFormData({
         email,
-        password
+        token
     }), {
         headers: {
             'Content-Type': 'application/json',
@@ -28,10 +28,8 @@ const login = (email, password) => new Promise((resolve, reject) => {
 
 
 const logout = token => new Promise((resolve, reject) => {
-    axios.post(API + '/auth/logout/', {
+    axios.post(API + '/auth/logout/', {}, {
         headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
             'Authorization': `Token ${token}`
         }
     })
@@ -42,97 +40,78 @@ const logout = token => new Promise((resolve, reject) => {
 
 
 const getUserInfo = token => new Promise((resolve, reject) => {
-    axios.get(API + '/auth/user/', {
+    axios.get(API + '/auth/get-user/', {
         headers: {
             'Authorization': `Token ${token}`
         }
     })
-    .then(res => {
-        resolve(res)
-    })
-    .catch(err => reject(err))
-})
-
-
-
-const getDrugstories = token => new Promise((resolve, reject) => {
-    axios.get(API + '/drugstores/', {
-        headers: {
-            'Authorization': `Token ${token}`
-        }
-    })
-    .then(res => res.data.data)
     .then(res => resolve(res))
     .catch(err => reject(err))
 })
 
 
 
-const getDrugstoreDetails = (token, id) => new Promise((resolve, reject) => {
-    axios.get(API + '/drugstores/' + id + '/', {
+const getPackages = token => new Promise((resolve, reject) => {
+    axios.get(API + '/packages/', {
         headers: {
             'Authorization': `Token ${token}`
         }
     })
-    .then(res => res.data)
-    .then(res => resolve(res))
+    .then(res => resolve(res.data.data))
     .catch(err => reject(err))
 })
 
 
 
-const createDrugstore = (token, data) => new Promise((resolve, reject) => {
-    axios.post(API + '/drugstores/', toFormData(data), {
+const createPackage = data => new Promise((resolve, reject) => {
+    axios.post(API + '/packages/', toFormData({ 
+        ...data, 
+        created_at: getNow(),
+        confirmed_at: '',
+        confirmed_by: null
+    }), {
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Token ${token}`
+            'Accept': 'application/json'
         }
     })
-    .then(res => res.data)
-    .then(res => resolve(res))
-    .catch(err => reject(err))
+    .then(res => resolve(res.data.data))
+    .catch(err => reject(err));
 })
 
 
 
-const createSchedule = (token, name, file, drugstore) => new Promise((resolve, reject) => {
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-        axios.post(API + '/schedules/', toFormData({
-            name,
-            file_input: reader.result,
-            drugstore
-        }), {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                'Accept': 'application/json',
-                'Authorization': `Token ${token}`
-            }
-        })
-        .then(res => res.data)
-        .then(res => resolve(res))
-        .catch(err => {
-            console.log(err.response);
-            reject(err);
-        })
-    }
-    reader.onerror = err => reject(err);
+const getPDF = id => new Promise((resolve, reject) => {
+    axios.get(API + `/labels/${id}/`)
+    .then(res => resolve(res.data.data))
+    .catch(err => reject(err));
 })
 
 
 
-const deleteSchedule = (token, id) => new Promise((resolve, reject) => {
-    axios.delete(API + '/schedules/' + id + '/', {
+const confirmPackage = (token, id) => new Promise((resolve, reject) => {
+    axios.patch(API + `/packages/${id}/`, {}, {
+        headers: {
+            'Authorization': `Token ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(res => resolve(res.data))
+    .catch(err => reject(err));
+})
+
+
+
+const getExcel = token => new Promise((resolve, reject) => {
+    axios.get(API + '/packages/statistics/', {
         headers: {
             'Authorization': `Token ${token}`
         }
     })
-    .then(res => {console.log(res); return res.data})
-    .then(res => resolve(res))
+    .then(res => resolve(res.data))
     .catch(err => reject(err))
 })
-
 
 
 
@@ -140,9 +119,9 @@ export {
     login,
     logout,
     getUserInfo,
-    getDrugstories,
-    getDrugstoreDetails,
-    createDrugstore,
-    createSchedule,
-    deleteSchedule
+    createPackage,
+    getPDF,
+    confirmPackage,
+    getPackages,
+    getExcel
 }

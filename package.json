@@ -1,7 +1,8 @@
 {
   "name": "frontend",
   "version": "0.1.0",
-  "backendUrl": "http://localhost/grafiki/backend",
+  "backendUrl": "http://192.168.0.234/silcpost/backend",
+  "authKey": "cuf67g78n9ynpg7g89vyt879gm7y495pm8ftfdcnvuo",
   "private": true,
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^28.0.0",
