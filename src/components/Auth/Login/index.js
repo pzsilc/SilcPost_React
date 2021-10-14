@@ -41,12 +41,6 @@ const Login = props => {
             className="p-10 mx-auto bg-gray-500 shadow-3xl rounded-3xl shadow-xl w-11/12 md:2/3 lg:w-1/2 mx-auto mt-20 mb-64 flex"
         >
             <div className="w-full text-center text-2xl">
-                <Link
-                    to="/silcpost/"
-                    className="text-5xl hover:no-underline hover:text-gray-300 float-left"
-                >
-                    &#x2039;
-                </Link>
                 <b className="text-center mb-10 block text-5xl text-gray-400">Logowanie</b>
                 <label className="text-left w-1/2">
                     <i className="fa fa-user mr-2"></i>

@@ -10,7 +10,7 @@ const Logout = props => {
         .then(res => {
             console.log(res);
             props.removeToken();
-            window.location.replace('/silcpost');
+            window.location.replace('/silcpost/login');
         })
         .catch(err => {
             console.log(err);

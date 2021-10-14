@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { toFormData, getNow } from '../functions';
+import { toFormData, getNow, createNotification } from '../functions';
 import packageJson from '../../package.json';
 const API = packageJson.backendUrl + '/api';
 
@@ -63,20 +63,30 @@ const getPackages = token => new Promise((resolve, reject) => {
 
 
 
-const createPackage = data => new Promise((resolve, reject) => {
-    axios.post(API + '/packages/', toFormData({ 
-        ...data, 
-        created_at: getNow(),
-        confirmed_at: '',
-        confirmed_by: null
-    }), {
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
+const createPackage = (data, token) => new Promise((resolve, reject) => {
+    data.on_delivery = Boolean(data.on_delivery);
+    getUserInfo(token)
+    .then(res => {
+        axios.post(API + '/packages/', toFormData({ 
+            ...data, 
+            created_at: getNow(),
+            created_by: res.data.data.app_id,
+            confirmed_at: '',
+            confirmed_by: null,
+            catcher: null,
+            waybill: ''
+        }), {
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => resolve(res.data.data))
+        .catch(err => reject(err));
     })
-    .then(res => resolve(res.data.data))
-    .catch(err => reject(err));
+    .catch(err => {
+        createNotification('error', 'Nieudana autoryzacja');
+    })
 })
 
 
@@ -89,8 +99,11 @@ const getPDF = id => new Promise((resolve, reject) => {
 
 
 
-const confirmPackage = (token, id) => new Promise((resolve, reject) => {
-    axios.patch(API + `/packages/${id}/`, {}, {
+const confirmPackage = (token, id, waybill, catcher) => new Promise((resolve, reject) => {
+    axios.patch(API + `/packages/${id}/`, toFormData({
+        waybill, 
+        catcher
+    }), {
         headers: {
             'Authorization': `Token ${token}`,
             'Content-Type': 'application/json',

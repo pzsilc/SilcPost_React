@@ -1,39 +1,90 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPackage, getPDF } from '../../../api';
 import { createNotification, download } from '../../../functions';
 import { Link } from 'react-router-dom';
+import AddNew from './AddNew';
+import AddExisting from './AddExisting';
+import { connect } from 'react-redux';
+const ADD_NEW = 'addNew'
+const ADD_EXISTING = 'addExisting'
 
-const initData = {
+const initAddNew = {
     recipint_name: "",
-    recipint_address: "",
+    street: "",
+    home_nb: "",
+    zip_code: "",
+    city: "",
     recipint_email: "",
     courier_name: "",
-    sender_name: "",
-    info: ""
+    on_delivery: false,
+    account_number: "",
 }
 
-const AddPackage = () => {
+const initAddExisting = {
+    order_number: "",
+    client_name: "",
+    where_is_package: ""
+}
 
-    const [data, setData] = useState(initData);
+
+
+
+const AddPackage = props => {
+    const [data, setData] = useState(initAddNew);
+    const [mode, setMode] = useState(ADD_NEW);
 
     const onChange = e => {
-        const { name, value } = e.target;
+        var { name, value } = e.target;
         setData({
             ...data,
             [name]: value
         });
     }
 
+    useEffect(() => {
+        if(mode === ADD_NEW){
+            if(data.zip_code.length === 2){
+                setData({
+                    ...data,
+                    zip_code: data.zip_code + '-'
+                });
+            }
+        }
+    }, [data]);
+
+    useEffect(() => {
+        setData(mode === ADD_NEW ? initAddNew : initAddExisting);
+    }, [mode])
+
     const onSubmit = e => {
         e.preventDefault();
-        createPackage(data)
+        let _data = Object.assign({}, data);
+        if(mode === ADD_NEW){
+            _data['order_number'] = ''
+            _data['client_name'] = ''
+            _data['where_is_package'] = ''
+        } else {
+            _data['recipint_name'] = ""
+            _data['street'] = ""
+            _data['home_nb'] = ""
+            _data['zip_code'] = ""
+            _data['city'] = ""
+            _data['recipint_email'] = ""
+            _data['courier_name'] = ""
+            _data['on_delivery'] = false
+            _data['account_number'] = ""
+        }
+
+        _data['belongs_to_new_order'] = (mode === ADD_NEW);
+
+        createPackage(_data, props.token)
         .then(res => {
             createNotification('success', 'Dodano paczkę')
             let { id } = res;
             getPDF(id)
             .then(res => {
                 download(res);
-                setData(initData);
+                setData(mode === ADD_NEW ? initAddNew : initAddExisting);
             })
             .catch(err => {
                 console.log(err);
@@ -49,108 +100,49 @@ const AddPackage = () => {
     return(
         <div>
             <Link
-                to="/silcpost/"
-                className="text-5xl hover:no-underline hover:text-gray-300 float-left ml-5"
+                to="/silcpost/logout"
+                className="text-md text-gray-400 hover:no-underline hover:text-gray-300 float-left ml-5"
             >
-                &#x2039;
+                Wyloguj się
             </Link>
-            <form
-                onSubmit={onSubmit}
-                className="w-2/3 mx-auto text-gray-300"
-            >
-                <div className="mt-10 w-2/3 text-left mx-auto">
-                    <h1 className="text-5xl mb-10">Nadaj paczkę</h1>
-                    <div className="bg-gray-400 rounded-xl text-gray-700 p-10">
-                        <label className="w-full">
-                            <b className="text-xl">* Nazwa odbiorcy (imię i nazwisko / nazwa firmy)</b>
-                            <br/>
-                            <input
-                                type="text"
-                                name="recipint_name"
-                                value={data.recipint_name}
-                                onChange={onChange}
-                                className="shadow rounded p-2 mt-2 bg-gray-200 w-full"
-                                maxLength="128"
-                                required
-                            />
-                        </label>
-                        <br/>
-                        <label className="w-full">
-                            <b className="text-xl">* Adres odbiorcy</b>
-                            <br/>
-                            <input
-                                type="text"
-                                name="recipint_address"
-                                value={data.recipint_address}
-                                onChange={onChange}
-                                className="shadow rounded p-2 mt-2 bg-gray-200 w-full"
-                                maxLength="512"
-                                required
-                            />
-                        </label>
-                        <br/>
-                        <label className="w-full">
-                            <b className="text-xl">Email odbiorcy</b>
-                            <br/>
-                            <input
-                                type="text"
-                                name="recipint_email"
-                                value={data.recipint_email}
-                                onChange={onChange}
-                                className="shadow rounded p-2 mt-2 bg-gray-200 w-full"
-                                maxLength="128"
-                            />
-                        </label>
-                        <br/>
-                        <label className="w-full">
-                            <b className="text-xl">* Nazwa kuriera</b>
-                            <br/>
-                            <input
-                                type="text"
-                                name="courier_name"
-                                value={data.courier_name}
-                                onChange={onChange}
-                                className="shadow rounded p-2 mt-2 bg-gray-200 w-full"
-                                maxLength="128"
-                                required
-                            />
-                        </label>
-                        <br/>
-                        <label className="w-full">
-                            <b className="text-xl">* Nazwa nadawcy</b>
-                            <br/>
-                            <input
-                                type="text"
-                                name="sender_name"
-                                value={data.sender_name}
-                                onChange={onChange}
-                                className="shadow rounded p-2 mt-2 bg-gray-200 w-full"
-                                maxLength="128"
-                                required
-                            />
-                        </label>
-                        <br/>
-                        <label className="w-full">
-                            <b className="text-xl">Co zrobić z paczką?</b>
-                            <br/>
-                            <textarea
-                                name="info"
-                                value={data.info}
-                                onChange={onChange}
-                                className="shadow rounded p-2 mt-2 bg-gray-200 w-full"
-                            ></textarea>
-                        </label>
-                    </div>
-                    <button
-                        type="submit"
-                        className="w-full p-3 rounded-xl mt-3 bg-purple-600 text-2xl text-purple-400"
+            <div className="w-1/3 mx-auto">
+                <div className="d-flex justify-content-between bg-gray-300 text-2xl text-center mb-2 rounded-2xl">
+                    <div 
+                        className={`p-3 cursor-pointer w-1/2 bg-gray-${mode === ADD_NEW ? '200 border-b-8 border-purple-400' : '700'}`}
+                        onClick={() => setMode('addNew')}
                     >
-                        <b>Nadaj</b>
-                    </button>
+                        Dodaj paczkę
+                    </div>
+                    <div 
+                        className={`p-3 cursor-pointer w-1/2 bg-gray-${mode === ADD_EXISTING ? '200 border-b-8 border-purple-400' : '700'}`}
+                        onClick={() => setMode('addExisting')}
+                    >
+                        Dołóż paczkę
+                    </div>
                 </div>
-            </form>
+                {mode === ADD_NEW ?
+                    <AddNew
+                        onSubmit={onSubmit}
+                        data={data}
+                        onChange={onChange}
+                    />
+                : 
+                    <AddExisting
+                        onSubmit={onSubmit}
+                        data={data}
+                        onChange={onChange}
+                    />
+                }
+            </div>
         </div>
     )
 }
 
-export default AddPackage;
+const mapStateToProps = state => ({ token: state.auth.token });
+export const AddPackageContainer = connect(mapStateToProps, null)(AddPackage);
+
+
+
+
+
+
