@@ -1,6 +1,6 @@
 import Home from './Home';
-import { AddPackageContainer as AddPackage } from './AddPackage';
-import { ConfirmPackagesContainer as ConfirmPackages } from './ConfirmPackages';
+import AddPackage from './AddPackage';
+import ConfirmPackages from './ConfirmPackages';
 
 export {
     Home,

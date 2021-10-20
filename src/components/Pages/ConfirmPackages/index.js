@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { confirmPackage, getPackages, getExcel } from '../../../api';
-import { createNotification, download } from '../../../functions';
+import { confirmPackage, getPackages } from '../../../api';
+import { createNotification } from '../../../functions';
 import ExistingList from './ExistingList';
 import NewList from './NewList';
 import Input from './Input';
@@ -11,13 +11,24 @@ import Input from './Input';
 const ConfirmPackages = props => {
 
     const [code, setCode] = useState("");
+    const [withWaybill, setWithWaybill] = useState(false);
     const [packages, setPackages] = useState([]);
     const [displayModal, setDisplayModal] = useState(false);
+
+    useEffect(() => {
+        if(displayModal){
+            let p = packages.find(i => i.id == code)
+            if(p){
+                console.log(p)
+                setWithWaybill(Boolean(parseInt(p.belongs_to_new_order)))
+            }
+        }
+    }, [displayModal])
 
     const submit = e => {
         e.preventDefault();
         const { id, waybill, catcher } = e.target;
-        confirmPackage(props.token, id.value, waybill.value, catcher.value)
+        confirmPackage(props.token, id.value, waybill ? waybill.value : "", catcher.value)
         .then(() => {
             createNotification('success', 'Zatwierdzono');
             fetchPackages();
@@ -63,18 +74,6 @@ const ConfirmPackages = props => {
         })
     }
 
-    const getStatistics = () => {
-        getExcel(props.token)
-        .then(res => {
-            console.log(res)
-            download(res.data, 'xlsx');
-        })
-        .catch(err => {
-            console.log(err);
-            createNotification('error', 'Nie udało się pobrać statystyk');
-        })
-    }
-
     useEffect(() => {
         fetchPackages();
         focusInput();
@@ -94,11 +93,11 @@ const ConfirmPackages = props => {
         <div className="w-10/12 mx-auto pb-36">
             <div id="mainModal"></div>
             <Input
+                withWaybill={withWaybill}
                 displayModal={displayModal}
                 setDisplayModal={setDisplayModal}
                 code={code}
                 submit={submit}
-                getStatistics={getStatistics}
                 onChange={onChange}
                 onSubmit={onSubmit}
             />
@@ -111,4 +110,4 @@ const ConfirmPackages = props => {
 
 
 const mapStateToProps = state => ({ token: state.auth.token });
-export const ConfirmPackagesContainer = connect(mapStateToProps, null)(ConfirmPackages);
+export default connect(mapStateToProps, null)(ConfirmPackages);

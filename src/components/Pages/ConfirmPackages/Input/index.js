@@ -27,13 +27,15 @@ const Input = props => {
                             name="id"
                             value={props.code}
                         />
-                        <input
-                            type="text"
-                            name="waybill"
-                            className="form-control"
-                            placeholder="Nr listu przewozowego"
-                            required
-                        />
+                        {props.withWaybill &&
+                            <input
+                                type="text"
+                                name="waybill"
+                                className="form-control"
+                                placeholder="Nr listu przewozowego"
+                                required
+                            />
+                        }
                         <input
                             type="text"
                             name="catcher"
@@ -57,13 +59,13 @@ const Input = props => {
                 <b>Sekcja skanowania</b>
             </h3>
             <div>
-                <button 
-                    onClick={props.getStatistics}
-                    className="hover:no-underline mr-5"
+                <Link 
+                    to="/silcpost/add-packages"
+                    className="hover:no-underline mr-3"
                 >
-                    <i className="fa fa-download mr-2"></i>
-                    Pobierz statystyki
-                </button>
+                    <i className="fa fa-plus mr-2"></i>
+                    Dodaj paczkę
+                </Link>
                 <Link 
                     to="/silcpost/logout"
                     className="hover:no-underline"

@@ -63,6 +63,14 @@ const getPackages = token => new Promise((resolve, reject) => {
 
 
 
+const getLocations = () => new Promise((resolve, reject) => {
+    axios.get(API + '/locations/')
+    .then(res => resolve(res.data.data))
+    .catch(err => reject(err))
+})
+
+
+
 const createPackage = (data, token) => new Promise((resolve, reject) => {
     data.on_delivery = Boolean(data.on_delivery);
     getUserInfo(token)
@@ -132,6 +140,7 @@ export {
     login,
     logout,
     getUserInfo,
+    getLocations,
     createPackage,
     getPDF,
     confirmPackage,

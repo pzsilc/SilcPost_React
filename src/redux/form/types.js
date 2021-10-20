@@ -1,0 +1,13 @@
+const SET_FIELD = 'SET_FIELD'
+const SWITCH_MODE = 'SWITCH_MODE'
+const RESET = 'RESET'
+const NEW_MODE = 'NEW_MODE'
+const EXISTING_MODE = 'EXISTING_MODE'
+
+export default {
+    SET_FIELD,
+    SWITCH_MODE,
+    RESET,
+    NEW_MODE,
+    EXISTING_MODE
+}

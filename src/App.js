@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter, Switch } from "react-router-dom";
-import { LoggedRoute, GuestRoute, ConfirmatorRoute, AdderRoute } from './middlewares';
+import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { LoggedRoute, GuestRoute, ConfirmatorRoute } from './middlewares';
 import { Header, Footer } from './components/Layout';
 import { LoginContainer, LogoutContainer } from './components/Auth';
 import { Home, AddPackage, ConfirmPackages } from './components/Pages';
@@ -21,10 +21,11 @@ const App = () => {
                 }}
             >
                 <Switch>
+                    <Route exact path="/silcpost" component={Home} />
                     <GuestRoute path='/silcpost/login' component={LoginContainer} />
                     <LoggedRoute path='/silcpost/logout' component={LogoutContainer} />
                     <ConfirmatorRoute path='/silcpost/confirm' component={ConfirmPackages} />
-                    <AdderRoute path='/silcpost/add-packages' component={AddPackage} />
+                    <LoggedRoute path='/silcpost/add-packages' component={AddPackage} />
                 </Switch>
             </main>
             <Footer/>

@@ -63,15 +63,26 @@ const AddNew = props => {
                             required
                         />
                     </div>
-                    <input
-                        type="email"
-                        name="recipint_email"
-                        value={props.data.recipint_email}
-                        onChange={props.onChange}
-                        className="shadow rounded p-2 mt-2 bg-gray-200 w-full"
-                        placeholder="Email odbiorcy"
-                        maxLength="128"
-                    />
+                    <div className="flex">
+                        <input
+                            type="email"
+                            name="recipint_email"
+                            value={props.data.recipint_email}
+                            onChange={props.onChange}
+                            className="shadow rounded p-2 mt-2 mr-1 bg-gray-200 w-full"
+                            placeholder="Email odbiorcy"
+                            maxLength="128"
+                        />
+                        <input
+                            type="phone"
+                            name="recipint_phone_number"
+                            value={props.data.recipint_phone_number}
+                            onChange={props.onChange}
+                            className="shadow rounded p-2 mt-2 ml-1 bg-gray-200 w-full"
+                            placeholder="Telefon odbiorcy"
+                            maxLength="16"
+                        />
+                    </div>
                     <div className="flex">
                         <div className="w-3/5 mt-3">
                             <Switch

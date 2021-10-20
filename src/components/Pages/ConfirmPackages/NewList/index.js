@@ -11,7 +11,12 @@ const NewList = ({ packages }) => {
                     <thead>
                         <tr className="text-purple-500 bg-gray-700">
                             <th className="p-2">ID</th>
-                            <th className="p-2">Email odbiorcy</th>
+                            <th className="p-2">Email</th>
+                            <th className="p-2">Telefon</th>
+                            <th className="p-2">Nazwa odbiorcy</th>
+                            <th className="p-2">Adres</th>
+                            <th className="p-2">pobranie</th>
+                            <th className="p-2">Nr konta</th>
                             <th className="p-2">Nazwa kuriera</th>
                             <th className="p-2">Data dodania</th>
                         </tr>
@@ -24,6 +29,11 @@ const NewList = ({ packages }) => {
                             >
                                 <td className="p-2">{p.id}</td>
                                 <td className="p-2">{p.recipint_email}</td>
+                                <td className="p-2">{p.recipint_phone_number}</td>
+                                <td className="p-2">{p.recipint_name}</td>
+                                <td className="p-2">{p.street} {p.home_number}, {p.city} {p.zip_code}</td>
+                                <td className="p-2">{p.on_delivery ? "Tak" : "Nie"}</td>
+                                <td className="p-2">{p.account_number}</td>
                                 <td className="p-2">{p.courier_name}</td>
                                 <td className="p-2">{p.created_at}</td>
                             </tr>

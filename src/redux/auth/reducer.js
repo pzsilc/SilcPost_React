@@ -7,7 +7,7 @@ const initState = {
     user: null
 }
 
-const authReducer = (state = initState, action) => {
+export default (state = initState, action) => {
     switch(action.type){
         case types.SET_TOKEN: {
             window.localStorage.setItem(tokenName, action.token);
@@ -33,5 +33,3 @@ const authReducer = (state = initState, action) => {
             return state
     }
 }
-
-export default authReducer;

@@ -14,10 +14,8 @@ const fetchUser = user => ({
 	user
 })
 
-const actions = {
+export default {
     setToken,
     remToken,
     fetchUser
 }
-
-export default actions;

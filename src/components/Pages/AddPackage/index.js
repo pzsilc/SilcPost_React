@@ -1,90 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { createPackage, getPDF } from '../../../api';
+import { createPackage, getLocations, getPDF, getUserInfo } from '../../../api';
 import { createNotification, download } from '../../../functions';
 import { Link } from 'react-router-dom';
 import AddNew from './AddNew';
+import { DownloadContainer } from './../../Layout/Download';
 import AddExisting from './AddExisting';
 import { connect } from 'react-redux';
-const ADD_NEW = 'addNew'
-const ADD_EXISTING = 'addExisting'
-
-const initAddNew = {
-    recipint_name: "",
-    street: "",
-    home_nb: "",
-    zip_code: "",
-    city: "",
-    recipint_email: "",
-    courier_name: "",
-    on_delivery: false,
-    account_number: "",
-}
-
-const initAddExisting = {
-    order_number: "",
-    client_name: "",
-    where_is_package: ""
-}
+import formTypes from '../../../redux/form/types'
+import formActions from '../../../redux/form/actions'
+import authActions from '../../../redux/auth/actions'
 
 
 
 
 const AddPackage = props => {
-    const [data, setData] = useState(initAddNew);
-    const [mode, setMode] = useState(ADD_NEW);
 
-    const onChange = e => {
-        var { name, value } = e.target;
-        setData({
-            ...data,
-            [name]: value
-        });
-    }
+    //on change handler for fields in form reducer (main content)
+    const onChange = e => props.setField(e.target.name, e.target.value)
 
-    useEffect(() => {
-        if(mode === ADD_NEW){
-            if(data.zip_code.length === 2){
-                setData({
-                    ...data,
-                    zip_code: data.zip_code + '-'
-                });
-            }
-        }
-    }, [data]);
+    //fetch user
+    useEffect(() => getUserInfo(props.token).then(props.fetchUser).catch(err => createNotification('error', err)), [])
 
-    useEffect(() => {
-        setData(mode === ADD_NEW ? initAddNew : initAddExisting);
-    }, [mode])
-
+    //on submit handler
     const onSubmit = e => {
-        e.preventDefault();
-        let _data = Object.assign({}, data);
-        if(mode === ADD_NEW){
-            _data['order_number'] = ''
-            _data['client_name'] = ''
-            _data['where_is_package'] = ''
-        } else {
-            _data['recipint_name'] = ""
-            _data['street'] = ""
-            _data['home_nb'] = ""
-            _data['zip_code'] = ""
-            _data['city'] = ""
-            _data['recipint_email'] = ""
-            _data['courier_name'] = ""
-            _data['on_delivery'] = false
-            _data['account_number'] = ""
-        }
-
-        _data['belongs_to_new_order'] = (mode === ADD_NEW);
-
-        createPackage(_data, props.token)
+        e.preventDefault()
+        //prepare the rest of data
+        const data = Object.assign({}, props.data)
+        data['belongs_to_new_order'] = (props.mode === formTypes.NEW_MODE)
+        //send request
+        createPackage(data, props.token)
         .then(res => {
             createNotification('success', 'Dodano paczkę')
-            let { id } = res;
-            getPDF(id)
+            getPDF(res.id)
             .then(res => {
-                download(res);
-                setData(mode === ADD_NEW ? initAddNew : initAddExisting);
+                download(res)
+                props.reset()
             })
             .catch(err => {
                 console.log(err);
@@ -99,37 +49,51 @@ const AddPackage = props => {
 
     return(
         <div>
+            <DownloadContainer/>
+            {(props.user && props.user.data.data.is_confirmator) &&
+                <React.Fragment>
+                    <Link
+                        to="/silcpost/confirm"
+                        className="text-md text-gray-400 hover:no-underline hover:text-gray-300 float-left ml-5"
+                    >
+                        <i className="fa fa-scanner mr-2"></i>
+                        Skanuj paczki
+                    </Link> 
+                    <br/>
+                </React.Fragment>
+            }
             <Link
                 to="/silcpost/logout"
                 className="text-md text-gray-400 hover:no-underline hover:text-gray-300 float-left ml-5"
             >
+                <i className="fa fa-sign-out mr-2"></i>
                 Wyloguj się
             </Link>
             <div className="w-1/3 mx-auto">
                 <div className="d-flex justify-content-between bg-gray-300 text-2xl text-center mb-2 rounded-2xl">
                     <div 
-                        className={`p-3 cursor-pointer w-1/2 bg-gray-${mode === ADD_NEW ? '200 border-b-8 border-purple-400' : '700'}`}
-                        onClick={() => setMode('addNew')}
+                        className={`p-3 cursor-pointer w-1/2 bg-gray-${props.mode === formTypes.NEW_MODE ? '200 border-b-8 border-purple-400' : '700'}`}
+                        onClick={() => props.switchMode(formTypes.NEW_MODE)}
                     >
                         Dodaj paczkę
                     </div>
                     <div 
-                        className={`p-3 cursor-pointer w-1/2 bg-gray-${mode === ADD_EXISTING ? '200 border-b-8 border-purple-400' : '700'}`}
-                        onClick={() => setMode('addExisting')}
+                        className={`p-3 cursor-pointer w-1/2 bg-gray-${props.mode === formTypes.EXISTING_MODE ? '200 border-b-8 border-purple-400' : '700'}`}
+                        onClick={() => props.switchMode(formTypes.EXISTING_MODE)}
                     >
                         Dołóż paczkę
                     </div>
                 </div>
-                {mode === ADD_NEW ?
+                {props.mode === formTypes.NEW_MODE ?
                     <AddNew
                         onSubmit={onSubmit}
-                        data={data}
+                        data={props.data}
                         onChange={onChange}
                     />
                 : 
                     <AddExisting
                         onSubmit={onSubmit}
-                        data={data}
+                        data={props.data}
                         onChange={onChange}
                     />
                 }
@@ -138,11 +102,19 @@ const AddPackage = props => {
     )
 }
 
-const mapStateToProps = state => ({ token: state.auth.token });
-export const AddPackageContainer = connect(mapStateToProps, null)(AddPackage);
+const mapStateToProps = state => ({ 
+    token: state.auth.token,
+    user: state.auth.user,
+    mode: state.form.mode,
+    data: state.form.data
+})
 
+const mapDispatchToProps = dispatch => ({
+    fetchUser: user => dispatch(authActions.fetchUser(user)),
+    setField: (name, value) => dispatch(formActions.setField(name, value)),
+    switchMode: mode => dispatch(formActions.switchMode(mode)),
+    reset: () => dispatch(formActions.reset())
+})
 
-
-
-
+export default connect(mapStateToProps, mapDispatchToProps)(AddPackage)
 

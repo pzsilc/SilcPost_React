@@ -79,35 +79,8 @@ const ConfirmatorRoute = ({ component: Component, ...rest }) => {
 
 
 
-const AdderRoute = ({ component: Component, ...rest }) => {
-    const [ isNotConfirmator, setIsNotConfirmator ] = useState(null);
-
-    useEffect(() => {
-        getUserInfo(window.localStorage.getItem(packageJson.authKey))
-        .then(res => {
-            setIsNotConfirmator(Boolean(res.data.data && !res.data.data.is_confirmator))
-
-        })
-        .catch(() => setIsNotConfirmator(false))
-    }, [])
-
-    if(isNotConfirmator === null)
-        return null;
-    return(
-        <Route {...rest} render={props => isNotConfirmator ? (
-                <Component {...props} />
-            ) : (
-                <Redirect to={{ pathname: '/silcpost/login', state: { from: props.location } }} />
-            )
-        }/>
-    )
-}
-
-
-
 export {
     GuestRoute,
     LoggedRoute,
     ConfirmatorRoute,
-    AdderRoute
 }

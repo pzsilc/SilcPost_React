@@ -1,6 +1,13 @@
-import React from 'react';
+import React from 'react'
+import { getLocations } from '../../../../api'
+import locationsActions from '../../../../redux/locations/actions'
+import { connect } from 'react-redux'
 
 const AddExisting = props => {
+    React.useEffect(() => {
+        getLocations().then(props.fetchLocations).catch(console.log)
+    }, [])
+
     return(
         <form
             onSubmit={props.onSubmit}
@@ -28,15 +35,33 @@ const AddExisting = props => {
                             required
                         />
                     </div>
-                    <input
-                        type="text"
+                    <select
                         className="shadow rounded p-2 mt-2 bg-gray-200 w-full"
-                        placeholder="Gdzie się paczka znajduje"
                         onChange={props.onChange}
-                        name="where_is_package"
-                        value={props.data.where_is_package}
+                        name="location"
                         required
-                    />
+                    >
+                        <option>Gdzie znajduje się paczka?...</option>
+                        {props.locations.map((location, key) => 
+                            <option
+                                value={location.id} 
+                                key={key}
+                                selected={props.data.location == location.id}
+                            >{location.name}</option>
+                        )}
+                    </select>
+                    {props.data.location == 6 &&
+                        <input
+                            name="where_is_package"
+                            value={props.data.where_is_package}
+                            onChange={props.onChange}
+                            type="text"
+                            maxLength="128"
+                            className="w-1/2 shadow rounded p-2 mt-2 bg-gray-200"
+                            placeholder="Napisz gdzie"
+                            required
+                        />
+                    }
                 </div>
                 <button
                     type="submit"
@@ -49,4 +74,13 @@ const AddExisting = props => {
     )
 }
 
-export default AddExisting;
+const mapStateToProps = state => ({
+    locations: state.locations.list
+})
+
+const mapDispatchToProps = dispatch => ({
+    fetchLocations: locations => dispatch(locationsActions.fetchLocations(locations))
+})
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddExisting)

@@ -1,0 +1,5 @@
+const FETCH_LOCATIONS = 'FETCH_LOCATIONS'
+
+export default {
+    FETCH_LOCATIONS
+}
